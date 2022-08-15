@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Belluno\Magento2\Model\Validations;
 
 use Belluno\Magento2\Service\BellunoService;
+use phpseclib3\Crypt\PublicKeyLoader;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use phpseclib\Crypt\RSA;
+use phpseclib3\Crypt\RSA;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\ScopeInterface;
 use Belluno\Magento2\Helper\Helper;
 
-class Encrypt {
+class Encrypt 
+{
 
   /** @var BellunoService */
   protected $_bellunoService;
@@ -88,14 +90,14 @@ class Encrypt {
    * @param $publicKey
    * @return string
    */
-  protected function encrypting($queryString, $publicKey) {
+  protected function encrypting($queryString, $publicKey) 
+  {
     $result = '';
 
-    $rsa = new RSA();
-    $rsa->loadKey($publicKey);
-    $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
-    $result = $rsa->encrypt($queryString);
-
-    return base64_encode($result);
+    $key = PublicKeyLoader::load($publicKey);
+    $key = $key->withPadding(RSA::ENCRYPTION_PKCS1);
+    $result = base64_encode($key->encrypt($queryString));
+    
+    return $result;
   }
 }

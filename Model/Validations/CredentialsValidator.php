@@ -7,19 +7,22 @@ namespace Belluno\Magento2\Model\Validations;
 use Magento\Framework\Exception\CouldNotSaveException;
 use DateTime;
 
-class CredentialsValidator {
-
+class CredentialsValidator 
+{
   /**
    * Function to validate number of cellphone
    * @param string $cellphone
    * @return bool
    */
-  public function validateCellphone(string $cellphone) {
-    if (preg_match('/^\([1-9]{2}\) (?:[2-8]|9[1-9])[0-9]{3}\-[0-9]{4}$/', $cellphone)) {
-      return true;
-    } else {
+  public function validateCellphone(string $cellphone) 
+  {
+    $cellphone = preg_replace('/[^0-9]/', '', $cellphone);
+    $cellphoneLenght = strlen($cellphone);
+    if( $cellphoneLenght < 10){ 
       return false;
     }
+    
+    return true;
   }
 
   /**
