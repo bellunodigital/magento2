@@ -11,8 +11,9 @@ class DocumentsValidator {
    * @param $document
    * @return bool
    */
-  public function validateDocument($document) {
-    $document = preg_replace('/[^0-9]/is', '', $document);
+  public function validateDocument($document) 
+  {
+    $document = preg_replace('/[^0-9]/', '', $document);
 
     if (strlen($document) == 11) {
       return $this->validateDocumentCpf($document);
@@ -26,7 +27,8 @@ class DocumentsValidator {
    * @param $document
    * @return bool
    */
-  protected function validateDocumentCpf($cpf) {
+  protected function validateDocumentCpf($cpf) 
+  {
     if (strlen($cpf) != 11) {
       return false;
     }

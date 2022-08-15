@@ -138,7 +138,7 @@ class CreditCardDataRequest implements BuilderInterface {
     $dateBirth = $additionalInformation['cardholder_birth'];
     $isValid = $this->_credentialValidator->validateDateBirth($dateBirth);
     if ($isValid == false) {
-      throw new CouldNotSaveException(__('Card Holder Birth is Invalid!'));
+      throw new CouldNotSaveException(__('Card Holder Birth is Invalid! Valid example: 17/03/2001'));
     }
 
     $name = $quote->getCustomerFirstname() . ' ' . $quote->getCustomerLastname();
@@ -147,13 +147,12 @@ class CreditCardDataRequest implements BuilderInterface {
 
     $this->_credentialValidator->validateClientData($name, $email, $phone);
 
-    $taxDocument = $this->getUseTaxDocumentCapture();
-    if (!$taxDocument) {
-      $clientDocument = $this->getTaxVat($customerId);
-    } else {
-      $clientDocument = $additionalInformation['client_document'];
-    }
     $cardHolderDocument = $additionalInformation['cardholder_document'];
+    $clientDocument = $cardHolderDocument;
+    $taxDocument = $this->getUseTaxDocumentCapture();    
+    if ($taxDocument == "1") {  
+      $clientDocument = $additionalInformation['client_document'];
+    } 
 
     $this->validations(
       $clientDocument,
@@ -204,15 +203,16 @@ class CreditCardDataRequest implements BuilderInterface {
    * @param string $cardNumber
    * @param string $cardCvv
    */
-  protected function validations($clientDocument, $cardHolderDocument, $cardNumber, $cardCvv) {
-    $validateClientDocument = $this->_documentsValidator->validateDocument($clientDocument);
-    if ($validateClientDocument != true) {
-      throw new CouldNotSaveException(__('Client Document is Invalid!'));
-    }
-
+  protected function validations($clientDocument, $cardHolderDocument, $cardNumber, $cardCvv) 
+  {
     $validateCardHolderDocument = $this->_documentsValidator->validateDocument($cardHolderDocument);
     if ($validateCardHolderDocument != true) {
       throw new CouldNotSaveException(__('Card Holder Document is Invalid!'));
+    }
+    
+    $validateClientDocument = $this->_documentsValidator->validateDocument($clientDocument);
+    if ($validateClientDocument != true) {
+      throw new CouldNotSaveException(__('Client Document is Invalid!'));
     }
 
     $validateCardNumber = $this->_cardValidator->validCreditCard($cardNumber);
